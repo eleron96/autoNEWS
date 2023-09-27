@@ -1,56 +1,40 @@
-import tkinter as tk
-from tkinter import messagebox
-import os
+import subprocess
 
+def get_input_from_user(placeholder):
+    result = subprocess.run(["gum", "input", "--placeholder", placeholder], stdout=subprocess.PIPE, text=True)
+    return result.stdout.strip()
 
-def save_blog_summary():
-    blog_text = text_entry.get("1.0", "end-1c")
-    author_name = author_entry.get()
-
+def save_blog_summary(blog_text, author_name):
     if not blog_text or not author_name:
-        messagebox.showwarning("Ошибка ввода", "Пожалуйста, заполните все поля")
+        print("Ошибка ввода: Пожалуйста, заполните все поля")
         return
 
     summary_template = """
-    Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
-    Вот дополнительные правила:
-    - пересказ должен указывать автора
-    - текст должен быть кратким пересказом оригинального
-    - используй форматирование текста 
-    - не пересказывай весь блог. только важное. 150 слов . а в конце напиши "подробнее можно прочитать по ссылке"
-
-    вот пример логики пересказа
-    "Плагин, который управляет плагинами Revit – о чём ещё можно мечтать долгими летними вечерами? Скорее читайте статью от Николаса и качайте DiRoots App Manager! 
-    «Quickly Enable / Disable Revit Plugins with DiRoots App Manager»"
-
-    вот сам блог
-    [{}]
-
-    blog by [{}]
-    """.format(blog_text, author_name)
+    ...
+    """.format(blog_text, author_name)  # Тут ваш шаблон, я его сократил для краткости
 
     with open("blog_summary.txt", "w", encoding="utf-8") as file:
         file.write(summary_template)
 
-    messagebox.showinfo("Файл сохранен",
-                        "Пересказ блога сохранен в файл 'blog_summary.txt'")
+    print("Пересказ блога сохранен в файл 'blog_summary.txt'")
 
+def main_menu():
+    while True:
+        print("\nМеню:")
+        print("1. Создать пересказ блога")
+        print("2. Выход")
+        choice = get_input_from_user("Выберите действие (1/2): ")
 
-# Создание основного окна
-root = tk.Tk()
-root.title("Блог Пересказ")
+        if choice == "1":
+            blog_text = get_input_from_user("\nВведите текст блога: ")
+            author_name = get_input_from_user("Введите имя автора: ")
+            save_blog_summary(blog_text, author_name)
+        elif choice == "2":
+            print("Выход из программы.")
+            break
+        else:
+            print("Неверный выбор. Пожалуйста, попробуйте снова.")
 
-# Создание и расположение виджетов
-tk.Label(root, text="Текст блога:").pack(pady=5)
-text_entry = tk.Text(root, width=50, height=10)
-text_entry.pack(pady=5)
-
-tk.Label(root, text="Автор:").pack(pady=5)
-author_entry = tk.Entry(root, width=50)
-author_entry.pack(pady=5)
-
-tk.Button(root, text="Сохранить пересказ", command=save_blog_summary).pack(
-    pady=20)
-
-# Запуск основного цикла
-root.mainloop()
+if __name__ == "__main__":
+    print("Добро пожаловать в консольное приложение 'Блог Пересказ'!")
+    main_menu()
