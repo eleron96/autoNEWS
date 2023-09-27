@@ -5,6 +5,9 @@ description = ""
 authors = ["nikogamsahurdia <eleron96@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+install-gum = "python scripts/install_gum.py"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 colorama = "^0.4.6"
