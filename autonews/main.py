@@ -1,8 +1,5 @@
-import subprocess
-
-def get_input_from_user(placeholder):
-    result = subprocess.run(["gum", "input", "--placeholder", placeholder], stdout=subprocess.PIPE, text=True)
-    return result.stdout.strip()
+def get_input_from_user(prompt):
+    return input(prompt)
 
 def save_blog_summary(blog_text, author_name):
     if not blog_text or not author_name:
@@ -10,7 +7,21 @@ def save_blog_summary(blog_text, author_name):
         return
 
     summary_template = """
-    ...
+    Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
+    Вот дополнительные правила:
+    - пересказ должен указывать автора
+    - текст должен быть кратким пересказом оригинального
+    - используй форматирование текста 
+    - не пересказывай весь блог. только важное. 150 слов . а в конце напиши "подробнее можно прочитать по ссылке"
+
+    вот пример логики пересказа
+    "Плагин, который управляет плагинами Revit – о чём ещё можно мечтать долгими летними вечерами? Скорее читайте статью от Николаса и качайте DiRoots App Manager! 
+    «Quickly Enable / Disable Revit Plugins with DiRoots App Manager»"
+
+    вот сам блог
+    [{}]
+
+    blog by [{}]
     """.format(blog_text, author_name)  # Тут ваш шаблон, я его сократил для краткости
 
     with open("blog_summary.txt", "w", encoding="utf-8") as file:
