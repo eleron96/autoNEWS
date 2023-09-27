@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "autonews"
+version = "0.1.0"
+description = ""
+authors = ["nikogamsahurdia <eleron96@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+colorama = "^0.4.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
