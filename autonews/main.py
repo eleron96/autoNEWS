@@ -1,10 +1,23 @@
+import os
+import datetime
+
+
 def get_input_from_user(prompt):
     return input(prompt)
+
 
 def save_blog_summary(blog_text, author_name):
     if not blog_text or not author_name:
         print("Ошибка ввода: Пожалуйста, заполните все поля")
         return
+
+    # Убедитесь, что папка 'summary' существует
+    if not os.path.exists("summary"):
+        os.makedirs("summary")
+
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"summary_{current_time}.txt"
+    filepath = os.path.join("summary", filename)
 
     summary_template = """
     Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
@@ -22,29 +35,55 @@ def save_blog_summary(blog_text, author_name):
     [{}]
 
     blog by [{}]
-    """.format(blog_text, author_name)  # Тут ваш шаблон, я его сократил для краткости
+    """.format(blog_text,
+               author_name)  # Тут ваш шаблон, я его сократил для краткости
 
-    with open("blog_summary.txt", "w", encoding="utf-8") as file:
+    with open(filepath, "w", encoding="utf-8") as file:
         file.write(summary_template)
 
-    print("Пересказ блога сохранен в файл 'blog_summary.txt'")
+    print(f"Пересказ блога сохранен в файл '{filepath}'")
+
+def view_summary_history():
+    summaries = os.listdir("summary")
+    if not summaries:
+        print("Нет сохраненных пересказов.")
+        return
+
+    print("Список всех сохраненных пересказов:")
+    for index, summary in enumerate(summaries, 1):
+        print(f"{index}. {summary}")
+
+    choice = input("Введите номер пересказа, который вы хотите просмотреть, или 'q' для выхода: ")
+    if choice.lower() == 'q':
+        return
+
+    try:
+        selected_summary = summaries[int(choice) - 1]
+        with open(os.path.join("summary", selected_summary), "r", encoding="utf-8") as file:
+            content = file.read()
+            print(content)
+    except (ValueError, IndexError):
+        print("Неверный выбор. Пожалуйста, попробуйте снова.")
 
 def main_menu():
     while True:
         print("\nМеню:")
-        print("1. Создать пересказ блога")
-        print("2. Выход")
-        choice = get_input_from_user("Выберите действие (1/2): ")
+        print("1. Создать новый пересказ")
+        print("2. Просмотреть историю пересказов")
+        print("3. Выйти")
+        choice = input("Выберите действие: ")
 
         if choice == "1":
             blog_text = get_input_from_user("\nВведите текст блога: ")
             author_name = get_input_from_user("Введите имя автора: ")
             save_blog_summary(blog_text, author_name)
         elif choice == "2":
-            print("Выход из программы.")
+            view_summary_history()
+        elif choice == "3":
             break
         else:
             print("Неверный выбор. Пожалуйста, попробуйте снова.")
+
 
 if __name__ == "__main__":
     print("Добро пожаловать в консольное приложение 'Блог Пересказ'!")
