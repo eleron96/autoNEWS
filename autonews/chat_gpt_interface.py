@@ -10,18 +10,23 @@ def chat_with_gpt(input_text):
 
     try:
         # Откройте веб-интерфейс Chat GPT
-        driver.get("URL_OF_CHAT_GPT_WEB_INTERFACE")
+        driver.get("https://chat.openai.com/?model=gpt-4")
 
         # Найдите поле ввода и введите ваш текст
         input_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "CSS_SELECTOR_OF_INPUT_FIELD"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#prompt-textarea"))
         )
         input_element.send_keys(input_text)
-        input_element.send_keys(Keys.RETURN)
 
-        # Ждите ответа и извлеките его
+        # Нажмите кнопку отправки
+        send_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-testid='send-button']"))
+        )
+        send_button.click()
+
+        # Ждите ответа и извлеките его (вам также понадобится CSS-селектор для поля ответа)
         response_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "CSS_SELECTOR_OF_RESPONSE_FIELD"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-testid^='conversation-turn-'] div.markdown.prose"))
         )
         response_text = response_element.text
 
@@ -29,4 +34,3 @@ def chat_with_gpt(input_text):
 
     finally:
         driver.quit()
-
