@@ -1,5 +1,6 @@
 import os
 import datetime
+from autonews.chat_gpt_interface import chat_with_gpt
 
 
 def get_input_from_user(prompt):
@@ -18,6 +19,7 @@ def save_blog_summary(blog_text, author_name):
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"summary_{current_time}.txt"
     filepath = os.path.join("summary", filename)
+
 
     summary_template = """
     Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
@@ -41,7 +43,14 @@ def save_blog_summary(blog_text, author_name):
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(summary_template)
 
-    print(f"Пересказ блога сохранен в файл '{filepath}'")
+    # Получите ответ от Chat GPT
+    gpt_response = chat_with_gpt(summary_template)
+
+    # Добавьте ответ в файл пересказа
+    with open(filepath, "a", encoding="utf-8") as file:
+        file.write("\n\n" + gpt_response)
+
+    print(f"Пересказ блога и ответ от Chat GPT сохранены в файл '{filepath}'")
 
 def view_summary_history():
     summaries = os.listdir("summary")
