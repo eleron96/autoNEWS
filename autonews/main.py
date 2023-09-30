@@ -38,8 +38,7 @@ def save_summary_to_file(blog_text, author_name):
     gpt_response = chat_with_gpt_api(summary_template)
 
     with open(filepath, "w", encoding="utf-8") as file:
-        file.write(summary_template)
-        file.write("\n\n" + gpt_response)
+        file.write(gpt_response)
 
     return filepath
 
