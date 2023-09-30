@@ -1,9 +1,8 @@
 import os
 import datetime
-from colorama import init, Fore
+from chat_gpt_interface import \
+    chat_with_gpt_api  # Импорт функции для взаимодействия с Chat GPT
 
-# Initializing colorama for colored output
-init()
 
 def ensure_directory_exists(directory_name):
     if not os.path.exists(directory_name):
@@ -17,7 +16,7 @@ def save_summary_to_file(blog_text, author_name):
     filename = f"summary_{current_time}.txt"
     filepath = os.path.join("summary", filename)
 
-    summary_template = """\
+    summary_template = """
     {}
     Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
     Вот дополнительные правила:
@@ -36,8 +35,11 @@ def save_summary_to_file(blog_text, author_name):
     blog by [{}]
     """.format(current_date, blog_text, author_name)
 
+    gpt_response = chat_with_gpt_api(summary_template)
+
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(summary_template)
+        file.write("\n\n" + gpt_response)
 
     return filepath
 
@@ -51,7 +53,17 @@ def read_summary_file(filename):
         return file.read()
 
 
-# UI functions:
+def get_multiline_input(
+        prompt="Введите текст (введите 'END' для завершения):\n"):
+    lines = []
+    print(prompt)
+    while True:
+        line = input()
+        if line == "END":
+            break
+        lines.append(line)
+    return "\n".join(lines)
+
 
 def main_menu():
     while True:
@@ -63,7 +75,7 @@ def main_menu():
         choice = input("Выберите действие: ")
 
         if choice == "1":
-            blog_text = input("\nВведите текст блога: ")
+            blog_text = get_multiline_input("\nВведите текст блога (введите 'END' для завершения):\n")
             author_name = input("Введите имя автора: ")
 
             if not blog_text or not author_name:
@@ -100,8 +112,6 @@ def main_menu():
         else:
             print("Неверный выбор. Пожалуйста, попробуйте снова.")
 
-
-# Starting the application
 
 if __name__ == "__main__":
     print("Добро пожаловать в консольное приложение 'Блог Пересказ'!")
