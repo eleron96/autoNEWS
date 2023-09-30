@@ -1,27 +1,24 @@
 import os
 import datetime
-from autonews.chat_gpt_interface import chat_with_gpt
+from colorama import init, Fore
+
+# Initializing colorama for colored output
+init()
+
+def ensure_directory_exists(directory_name):
+    if not os.path.exists(directory_name):
+        os.makedirs(directory_name)
 
 
-def get_input_from_user(prompt):
-    return input(prompt)
-
-
-def save_blog_summary(blog_text, author_name):
-    if not blog_text or not author_name:
-        print("Ошибка ввода: Пожалуйста, заполните все поля")
-        return
-
-    # Убедитесь, что папка 'summary' существует
-    if not os.path.exists("summary"):
-        os.makedirs("summary")
-
+def save_summary_to_file(blog_text, author_name):
+    ensure_directory_exists("summary")
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    current_date = datetime.datetime.now().strftime("%Y.%m.%d")
     filename = f"summary_{current_time}.txt"
     filepath = os.path.join("summary", filename)
 
-
-    summary_template = """
+    summary_template = """\
+    {}
     Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
     Вот дополнительные правила:
     - пересказ должен указывать автора
@@ -37,42 +34,24 @@ def save_blog_summary(blog_text, author_name):
     [{}]
 
     blog by [{}]
-    """.format(blog_text,
-               author_name)  # Тут ваш шаблон, я его сократил для краткости
+    """.format(current_date, blog_text, author_name)
 
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(summary_template)
 
-    # Получите ответ от Chat GPT
-    gpt_response = chat_with_gpt(summary_template)
+    return filepath
 
-    # Добавьте ответ в файл пересказа
-    with open(filepath, "a", encoding="utf-8") as file:
-        file.write("\n\n" + gpt_response)
 
-    print(f"Пересказ блога и ответ от Chat GPT сохранены в файл '{filepath}'")
+def get_all_summaries():
+    return os.listdir("summary")
 
-def view_summary_history():
-    summaries = os.listdir("summary")
-    if not summaries:
-        print("Нет сохраненных пересказов.")
-        return
 
-    print("Список всех сохраненных пересказов:")
-    for index, summary in enumerate(summaries, 1):
-        print(f"{index}. {summary}")
+def read_summary_file(filename):
+    with open(os.path.join("summary", filename), "r", encoding="utf-8") as file:
+        return file.read()
 
-    choice = input("Введите номер пересказа, который вы хотите просмотреть, или 'q' для выхода: ")
-    if choice.lower() == 'q':
-        return
 
-    try:
-        selected_summary = summaries[int(choice) - 1]
-        with open(os.path.join("summary", selected_summary), "r", encoding="utf-8") as file:
-            content = file.read()
-            print(content)
-    except (ValueError, IndexError):
-        print("Неверный выбор. Пожалуйста, попробуйте снова.")
+# UI functions:
 
 def main_menu():
     while True:
@@ -80,19 +59,49 @@ def main_menu():
         print("1. Создать новый пересказ")
         print("2. Просмотреть историю пересказов")
         print("3. Выйти")
+
         choice = input("Выберите действие: ")
 
         if choice == "1":
-            blog_text = get_input_from_user("\nВведите текст блога: ")
-            author_name = get_input_from_user("Введите имя автора: ")
-            save_blog_summary(blog_text, author_name)
+            blog_text = input("\nВведите текст блога: ")
+            author_name = input("Введите имя автора: ")
+
+            if not blog_text or not author_name:
+                print("Ошибка ввода: Пожалуйста, заполните все поля")
+                continue
+
+            filepath = save_summary_to_file(blog_text, author_name)
+            print(
+                f"Пересказ блога и ответ от Chat GPT сохранены в файл '{filepath}'")
         elif choice == "2":
-            view_summary_history()
+            summaries = get_all_summaries()
+            if not summaries:
+                print("Нет сохраненных пересказов.")
+                continue
+
+            print("Список всех сохраненных пересказов:")
+            for index, summary in enumerate(summaries, 1):
+                print(f"{index}. {summary}")
+
+            choice = input(
+                "Введите номер пересказа, который вы хотите просмотреть, или 'q' для выхода: ")
+
+            if choice.lower() == 'q':
+                continue
+
+            try:
+                selected_summary = summaries[int(choice) - 1]
+                content = read_summary_file(selected_summary)
+                print(content)
+            except (ValueError, IndexError):
+                print("Неверный выбор. Пожалуйста, попробуйте снова.")
         elif choice == "3":
             break
         else:
             print("Неверный выбор. Пожалуйста, попробуйте снова.")
 
+
+# Starting the application
 
 if __name__ == "__main__":
     print("Добро пожаловать в консольное приложение 'Блог Пересказ'!")
