@@ -14,8 +14,8 @@ def summarize_text(text, author):
             model="gpt-3.5-turbo",
             messages=[{
                 "role": "user",
-                "content": f"Summarize the following text(Blog) "
-                           f"written by {author}."
+                "content": f"Summarize the following new text in Blog "
+                           f"written by {author}.Must be mentioned"
                            f"use name autor in the text."
                            f"Rewrite the text in your own words as a freeform paraphrase. "
                            f"Make the story engaging and seamless. Limit the word count to 150:\n{text}"
