@@ -164,6 +164,12 @@ class App:
             state=tk.DISABLED)  # Сделать текстовое поле только для чтения
         self.text_article_link.pack(pady=5)
 
+        self.button_copy = ttk.Button(self.summary_detail_frame,
+                                      text="Copy Data",
+                                      command=lambda: self.copy_data_to_clipboard(
+                                          article_title, text, article_link))
+        self.button_copy.pack(pady=5, side=tk.RIGHT)
+
         self.button_close = ttk.Button(self.summary_detail_frame, text="Exit",
                                        command=self.close_summary_detail)
         self.button_close.pack(pady=5, side=tk.RIGHT)
@@ -171,6 +177,12 @@ class App:
         self.button_back = ttk.Button(self.summary_detail_frame, text="Back",
                                       command=self.back_to_summaries_from_detail)
         self.button_back.pack(pady=5, side=tk.RIGHT)
+
+    def copy_data_to_clipboard(self, article_title, text, article_link):
+        data_to_copy = f"{article_title}\n {text}\n Read more at the link: {article_link}"
+        self.root.clipboard_clear()
+        self.root.clipboard_append(data_to_copy)
+        self.root.update()
 
     def close_summary_detail(self):
         self.summary_detail_frame.pack_forget()
