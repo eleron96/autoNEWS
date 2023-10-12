@@ -1,117 +1,80 @@
 import os
+import openai
 import datetime
-from chat_gpt_interface import \
-    chat_with_gpt_api  # Импорт функции для взаимодействия с Chat GPT
+import re  # Импортируем модуль регулярных выражений
+import textwrap
+
+# Чтение API ключа из файла
+with open("api_key.txt", "r") as file:
+    openai.api_key = file.read().strip()
+
+# Функция для удаления лишних пробелов и пустых строк
+def clean_text(text):
+    # Удаление лишних пробелов и пустых строк
+    return re.sub(r'\n\s*\n', '\n', text.strip())
+
+# Функция для отправки текста в API и получения ответа
+def summarize_text(text, author):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user",
+                       "content": f"Summarize the following text(Blog) "
+                                  f"written by {author}."
+                                  f"use name autor in the text."
+                                  f"Rewrite the text in your own words as a freeform paraphrase. "
+                                  f"Make the story engaging and seamless. Limit the word count to 150:\n{text}"}],
+            temperature=0.5, # Temperature может быть полезно увеличить для более творческих ответов
+            max_tokens=1024  # Ограничиваем ответ до 1024 токенов
+        )
+        message = response['choices'][0]['message']['content']
+        return clean_text(message)  # Очистка полученного текста
+    except Exception as e:
+        return str(e)
 
 
-def ensure_directory_exists(directory_name):
-    if not os.path.exists(directory_name):
-        os.makedirs(directory_name)
+# Сохранение текста в файл
+def save_summary(author, summary):
+    date_string = datetime.datetime.now().strftime("%Y_%m_%d")
+    filename = f"summary/{date_string}_{author}.txt"
+
+    os.makedirs("summary",
+                exist_ok=True)  # Создание папки summary, если она не существует
+
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(summary)
+
+# Вывод результата
+def print_summarized_text(summarized_text):
+    decorated_text = "\n" + "="*30 + " Summarized Text " + "="*30 + "\n"
+    # textwrap.wrap возвращает список строк, которые соответствуют заданной ширине. 80 - это примерное значение,
+    # вы можете установить его в зависимости от вашей консоли. Затем мы соединяем строки с помощью "\n" для печати.
+    wrapped_text = "\n".join(textwrap.wrap(summarized_text, width=80))
+    decorated_text += wrapped_text + "\n" + "="*80 + "\n"
+    print(decorated_text)
 
 
-def save_summary_to_file(blog_text, author_name):
-    ensure_directory_exists("summary")
-    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    current_date = datetime.datetime.now().strftime("%Y.%m.%d")
-    filename = f"summary_{current_time}.txt"
-    filepath = os.path.join("summary", filename)
+# Ввод имени автора
+author = input("Please input the author's name: ")
 
-    summary_template = """
-    {}
-    Напиши короткий пересказ на блог ниже ( я его пометил Блог). 
-    Вот дополнительные правила:
-    - пересказ должен указывать автора
-    - текст должен быть кратким пересказом оригинального
-    - используй форматирование текста 
-    - не пересказывай весь блог. только важное. 150 слов . а в конце напиши "подробнее можно прочитать по ссылке"
+# Ввод текста пользователем
+print(
+    "Please input the text you want summarized. Input 'END' in a new line to finish.")
+user_input_lines = []
+while True:
+    line = input()
+    if line == 'END':
+        break
+    user_input_lines.append(line)
 
-    вот пример логики пересказа
-    "Плагин, который управляет плагинами Revit – о чём ещё можно мечтать долгими летними вечерами? Скорее читайте статью от Николаса и качайте DiRoots App Manager! 
-    «Quickly Enable / Disable Revit Plugins with DiRoots App Manager»"
+user_input_text = "\n".join(user_input_lines)
 
-    вот сам блог
-    [{}]
+# Получаем и выводим пересказанный текст
+print("\nSending text to OpenAI GPT...")
+summarized_text = summarize_text(user_input_text, author)
 
-    blog by [{}]
-    """.format(current_date, blog_text, author_name)
+# Выводим красиво оформленный текст
+print_summarized_text(summarized_text)
 
-    gpt_response = chat_with_gpt_api(summary_template)
-
-    with open(filepath, "w", encoding="utf-8") as file:
-        file.write(gpt_response)
-
-    return filepath
-
-
-def get_all_summaries():
-    return os.listdir("summary")
-
-
-def read_summary_file(filename):
-    with open(os.path.join("summary", filename), "r", encoding="utf-8") as file:
-        return file.read()
-
-
-def get_multiline_input(
-        prompt="Введите текст (введите 'END' для завершения):\n"):
-    lines = []
-    print(prompt)
-    while True:
-        line = input()
-        if line == "END":
-            break
-        lines.append(line)
-    return "\n".join(lines)
-
-
-def main_menu():
-    while True:
-        print("\nМеню:")
-        print("1. Создать новый пересказ")
-        print("2. Просмотреть историю пересказов")
-        print("3. Выйти")
-
-        choice = input("Выберите действие: ")
-
-        if choice == "1":
-            blog_text = get_multiline_input("\nВведите текст блога (введите 'END' для завершения):\n")
-            author_name = input("Введите имя автора: ")
-
-            if not blog_text or not author_name:
-                print("Ошибка ввода: Пожалуйста, заполните все поля")
-                continue
-
-            filepath = save_summary_to_file(blog_text, author_name)
-            print(
-                f"Пересказ блога и ответ от Chat GPT сохранены в файл '{filepath}'")
-        elif choice == "2":
-            summaries = get_all_summaries()
-            if not summaries:
-                print("Нет сохраненных пересказов.")
-                continue
-
-            print("Список всех сохраненных пересказов:")
-            for index, summary in enumerate(summaries, 1):
-                print(f"{index}. {summary}")
-
-            choice = input(
-                "Введите номер пересказа, который вы хотите просмотреть, или 'q' для выхода: ")
-
-            if choice.lower() == 'q':
-                continue
-
-            try:
-                selected_summary = summaries[int(choice) - 1]
-                content = read_summary_file(selected_summary)
-                print(content)
-            except (ValueError, IndexError):
-                print("Неверный выбор. Пожалуйста, попробуйте снова.")
-        elif choice == "3":
-            break
-        else:
-            print("Неверный выбор. Пожалуйста, попробуйте снова.")
-
-
-if __name__ == "__main__":
-    print("Добро пожаловать в консольное приложение 'Блог Пересказ'!")
-    main_menu()
+# Сохраняем пересказанный текст в файл
+save_summary(author, summarized_text)
