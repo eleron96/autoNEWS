@@ -112,7 +112,9 @@ class App:
 
         summaries = get_summaries()
         for summary in summaries:
-            display_text = f"{summary[3]} | {summary[1]} | {len(summary[2])} chars"
+            # Используйте article_title как короткую тему
+            short_topic = summary[4]  # article_title из вашей базы данных
+            display_text = f"{summary[3]} | {summary[1]} | {short_topic} | {len(summary[2])} chars"
             self.listbox_summaries.insert(tk.END, display_text)
 
         self.listbox_summaries.bind('<Double-1>', self.view_summary)
@@ -125,22 +127,42 @@ class App:
         summary = get_summaries()[selected_index[0]]
         author = summary[1]
         text = summary[2]
+        article_title = summary[4]  # Добавлено
+        article_link = summary[5]   # Добавлено
 
         self.summaries_frame.pack_forget()
-        self.show_summary_detail(author, text)
+        self.show_summary_detail(author, text, article_title, article_link)
 
-    def show_summary_detail(self, author, text):
+    def show_summary_detail(self, author, text, article_title=None, article_link=None):
         self.summary_detail_frame = ttk.Frame(self.root)
         self.summary_detail_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.label_author = ttk.Label(self.summary_detail_frame,
-                                      text=f"Author: {author}")
-        self.label_author.pack(pady=5)
+        self.text_author = tk.Text(self.summary_detail_frame, height=1,
+                                   width=50)
+        self.text_author.insert(tk.END, f"Author: {author}")
+        self.text_author.config(
+            state=tk.DISABLED)  # Сделать текстовое поле только для чтения
+        self.text_author.pack(pady=5)
 
         self.text_summary = tk.Text(self.summary_detail_frame, height=10,
                                     width=80)
         self.text_summary.insert(tk.END, text)
         self.text_summary.pack(pady=5, padx=5, fill=tk.X)
+
+        self.text_article_title = tk.Text(self.summary_detail_frame, height=1,
+                                          width=50)
+        self.text_article_title.insert(tk.END,
+                                       f"Article Title: {article_title}")
+        self.text_article_title.config(
+            state=tk.DISABLED)  # Сделать текстовое поле только для чтения
+        self.text_article_title.pack(pady=5)
+
+        self.text_article_link = tk.Text(self.summary_detail_frame, height=1,
+                                         width=50)
+        self.text_article_link.insert(tk.END, f"Article Link: {article_link}")
+        self.text_article_link.config(
+            state=tk.DISABLED)  # Сделать текстовое поле только для чтения
+        self.text_article_link.pack(pady=5)
 
         self.button_close = ttk.Button(self.summary_detail_frame, text="Exit",
                                        command=self.close_summary_detail)
