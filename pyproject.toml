@@ -11,6 +11,7 @@ python = "^3.11"
 selenium = "^4.13.0"
 colorama = "^0.4.6"
 requests = "^2.31.0"
+openai = "^0.28.1"
 
 
 [build-system]
