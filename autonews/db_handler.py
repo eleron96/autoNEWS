@@ -3,15 +3,13 @@ import os
 
 DB_NAME = "autonews.db"
 
-
 def create_connection():
-    conn = None;
+    conn = None
     try:
         conn = sqlite3.connect(os.path.join(os.getcwd(), DB_NAME))
     except sqlite3.Error as e:
         print(e)
     return conn
-
 
 def create_table():
     conn = create_connection()
@@ -22,7 +20,9 @@ def create_table():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 author TEXT NOT NULL,
                 summary TEXT NOT NULL,
-                date TEXT NOT NULL
+                date TEXT NOT NULL,
+                article_title TEXT,
+                article_link TEXT
             )
         ''')
         conn.commit()
@@ -32,22 +32,20 @@ def create_table():
         if conn:
             conn.close()
 
-
-def insert_summary(author, summary, date):
+def insert_summary(author, summary, date, article_title, article_link):
     conn = create_connection()
     try:
         c = conn.cursor()
         c.execute('''
-            INSERT INTO summaries (author, summary, date)
-            VALUES (?, ?, ?)
-        ''', (author, summary, date))
+            INSERT INTO summaries (author, summary, date, article_title, article_link)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (author, summary, date, article_title, article_link))
         conn.commit()
     except sqlite3.Error as e:
         print(e)
     finally:
         if conn:
             conn.close()
-
 
 def get_summaries():
     conn = create_connection()

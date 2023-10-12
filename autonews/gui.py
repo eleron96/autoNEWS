@@ -41,6 +41,20 @@ class App:
         self.text_blog = tk.Text(self.request_frame, height=10)
         self.text_blog.pack(pady=5, padx=5, fill=tk.X)
 
+        self.label_article_title = ttk.Label(self.request_frame,
+                                             text="Article Title:")
+        self.label_article_title.pack(pady=5)
+
+        self.entry_article_title = ttk.Entry(self.request_frame, width=50)
+        self.entry_article_title.pack(pady=5, padx=5, fill=tk.X)
+
+        self.label_article_link = ttk.Label(self.request_frame,
+                                            text="Article Link:")
+        self.label_article_link.pack(pady=5)
+
+        self.entry_article_link = ttk.Entry(self.request_frame, width=50)
+        self.entry_article_link.pack(pady=5, padx=5, fill=tk.X)
+
         self.button_exit = ttk.Button(self.request_frame, text="Exit",
                                       command=self.root.destroy)
         self.button_exit.pack(pady=5, side=tk.RIGHT)
@@ -67,7 +81,7 @@ class App:
         summarized_text = summarize_text(blog_text, author)
 
         date_string = datetime.datetime.now().strftime("%Y-%m-%d")
-        insert_summary(author, summarized_text, date_string)
+        insert_summary(author, summarized_text, date_string, self.entry_article_title.get(), self.entry_article_link.get())
 
         self.request_frame.pack_forget()
         self.show_result(summarized_text)
