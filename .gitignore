@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 .idea/
 autonews/api_key.txt
+autonews/summary/
 # C extensions
 *.so
 
