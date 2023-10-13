@@ -1,4 +1,4 @@
-
+[![Maintainability](https://api.codeclimate.com/v1/badges/f9c78cdc02319b1c5d49/maintainability)](https://codeclimate.com/github/eleron96/autoNEWS/maintainability)
 # autoNEWS
 
 ## Project Description
