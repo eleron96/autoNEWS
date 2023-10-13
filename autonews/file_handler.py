@@ -1,9 +1,12 @@
 import os
 import datetime
+from pathlib import Path
+
+SUMMARY_DIR = Path(__file__).parent / "summary"
 
 def save_summary(author, summary):
     date_string = datetime.datetime.now().strftime("%Y_%m_%d")
-    filename = f"summary/{date_string}_{author}.txt"
+    filename = SUMMARY_DIR / f"{date_string}_{author}.txt"
 
     os.makedirs("summary", exist_ok=True)
 

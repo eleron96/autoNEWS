@@ -1,7 +1,11 @@
 import sqlite3
 import os
+from pathlib import Path
 
-DB_NAME = "autonews/autonews.db"
+DB_DIR = Path(__file__).parent / "db"
+DB_NAME = DB_DIR / "autonews.db"
+
+
 
 def create_connection():
     conn = None
