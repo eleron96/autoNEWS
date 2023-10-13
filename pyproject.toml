@@ -13,6 +13,11 @@ colorama = "^0.4.6"
 requests = "^2.31.0"
 openai = "^0.28.1"
 pytest = "^7.4.2"
+py2app = "^0.28.6"
+setuptools = "^68.2.2"
+pipreqs = "^0.4.13"
+aiohttp = "^3.8.6"
+wheel = "^0.41.2"
 
 
 [build-system]
