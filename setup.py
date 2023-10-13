@@ -3,7 +3,7 @@ from setuptools import setup
 
 APP_NAME = "AutoNews"
 APP = ['autonews/main.py']
-DATA_FILES = [('autonews', ['autonews/autonews.db'])]
+DATA_FILES = [('autonews/autonews', ['autonews/autonews.db'])]
 OPTIONS = {
     'packages': ['openai', 'aiohttp', 'wheel', 'selenium',
                  'colorama', 'requests', 'pipreqs'],

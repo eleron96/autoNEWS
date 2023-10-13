@@ -1,2 +1,3 @@
+# Run the application
 run:
-	poetry run python -m autonews.main
+	poetry run python autonews/main.py

@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_NAME = "autonews.db"
+DB_NAME = "autonews/autonews.db"
 
 def create_connection():
     conn = None

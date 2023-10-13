@@ -1,8 +1,10 @@
 import openai
 import re
+from pathlib import Path
 
+here = Path(__file__).parent
 # Чтение API ключа из файла
-with open("api_key.txt", "r") as file:
+with open(here / "api_key.txt", "r") as file:
     openai.api_key = file.read().strip()
 
 def clean_text(text):
