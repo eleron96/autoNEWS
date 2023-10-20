@@ -4,12 +4,12 @@ from api_handler import summarize_text
 from db_handler import create_table, insert_summary, get_summaries
 import datetime
 
-
 class App:
     def __init__(self, root):
         self.root = root
         root.title("AutoNews Summarizer")
         self.create_main_frame()
+        self.style_widgets()
 
     def create_main_frame(self):
         self.main_frame = ttk.Frame(self.root)
@@ -119,6 +119,7 @@ class App:
 
         self.listbox_summaries.bind('<Double-1>', self.view_summary)
 
+
     def view_summary(self, event=None):
         selected_index = self.listbox_summaries.curselection()
         if not selected_index:
@@ -192,9 +193,30 @@ class App:
         self.summary_detail_frame.pack_forget()
         self.create_summaries_frame()
 
+    def style_widgets(self):
+        style = ttk.Style()
+        style.configure("TButton", padding=6, relief="ridge", background="#ccc", foreground="white")
+        style.map("TButton",
+                  foreground=[('pressed', 'gray'), ('active', 'black')],
+                  background=[('pressed', '!disabled', 'black'), ('active', 'white')]
+                  )
+        style.configure("TLabel", padding=6, relief="flat", background="#eee", foreground="white")
+        style.configure("TFrame", background="#eee")
+
 
 def start_gui():
     root = tk.Tk()
-    root.geometry("600x400")  # Задаем одинаковый размер для всех окон
+
+    # Установка размера и позиции окна
+    window_width, window_height = 700, 500
+    position_right = int(root.winfo_screenwidth() / 2 - window_width / 2)
+    position_down = int(root.winfo_screenheight() / 2 - window_height / 2)
+    root.geometry(
+        f"{window_width}x{window_height}+{position_right}+{position_down}")
+
+    # Установка прозрачности
+    root.attributes('-alpha', 0.95)
+
+    root.resizable(False, False)  # Запрещаем изменение размера окна
     app = App(root)
     root.mainloop()
